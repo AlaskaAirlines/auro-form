@@ -13,7 +13,9 @@ index.md is created by running `npm run build:markdownDocs`.
 This file is generated based on a template fetched from `./docs/partials/index.md`
 -->
 
-# Dropdown
+# Form
+
+## Dropdown
 
 <!-- AURO-GENERATED-CONTENT:START (FILE:src=./description.md) -->
 <!-- The below content is automatically added from ./description.md -->
@@ -29,7 +31,7 @@ _Note: if the dropdown content in your implementation is not interactive (e.g. a
 <my-select></my-select>
 <br /><br /><br /><br />
 
-# Input
+## Input
 
 <auro-input required placeholder="John Doe">
     <span slot="label">Full name</span>
