@@ -1,0 +1,12 @@
+{
+  "name": "@auroformkit/form-validation",
+  "description": "Shared validation for all form components in auro-formkit monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/validation.js",
+  "types": "tsc",
+  "exports": {
+    ".": "./src/validation.js"
+  }
+}
