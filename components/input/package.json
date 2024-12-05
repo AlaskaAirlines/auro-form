@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@aurodesignsystem/auro-button": "^8.1.3",
-    "@aurodesignsystem/auro-formvalidation": "^1.0.4",
     "@aurodesignsystem/auro-icon": "^6.0.2",
     "chalk": "^5.3.0",
     "cleave.js": "^1.6.0",
@@ -28,6 +27,7 @@
     "@auro-formkit/build-tools": "*",
     "@auro-formkit/config": "*",
     "@auro-formkit/typescript": "*",
+    "@auroformkit/form-validation": "*",
     "@alaskaairux/icons": "^4.44.1",
     "@aurodesignsystem/design-tokens": "^4.10.1",
     "@aurodesignsystem/webcorestylesheets": "^5.1.2",
