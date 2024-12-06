@@ -30,7 +30,6 @@ import { UtilitiesCalendarRender } from './utilitiesCalendarRender.js';
  * - 'narrow' (e.g., T).
  * Default is 'short'.
  * @event auroCalendar-dateSelected - Notifies that a date has been selected in the calendar.
- * @event auroCalendar-ready - Notifies that the component has finished initializing.
  * @event auroCalendar-monthChanged - Notifies that the visible calendar month(s) have changed.
  */
 
@@ -40,11 +39,6 @@ import { UtilitiesCalendarRender } from './utilitiesCalendarRender.js';
 export class AuroCalendar extends RangeDatepicker {
   constructor() {
     super();
-
-    /**
-     * @private
-     */
-    this.runtimeUtils = new AuroLibraryRuntimeUtils();
 
     /**
      * @private
@@ -61,7 +55,6 @@ export class AuroCalendar extends RangeDatepicker {
      */
     this.utilCalRender = new UtilitiesCalendarRender();
 
-    this.datepicker = this.runtimeUtils.closestElement('auro-datepicker', this);
     this.calendarStartDate = undefined;
     this.calendarEndDate = undefined;
     this.centralDate = undefined;
@@ -83,10 +76,17 @@ export class AuroCalendar extends RangeDatepicker {
      */
     this.numCalendars = undefined;
 
+
     /**
      * @private
      */
-    this.mobileBreakpoint = 660;
+    this.isVisible = false;
+
+
+    /**
+     * @private
+     */
+    this.slots = {};
   }
 
   static get styles() {
@@ -155,76 +155,84 @@ export class AuroCalendar extends RangeDatepicker {
    * @returns {Object} Returns the auro-calendar-months HTML.
    */
   renderAllCalendars() {
-    this.utilCalRender.setFirstRenderableMonthDate(this);
+    if (this.isVisible) {
+      this.utilCalRender.setFirstRenderableMonthDate(this);
 
-    const mobileLayout = window.innerWidth < this.mobileBreakpoint;
-    let renderedHtml = undefined;
+      const dropdown = AuroLibraryRuntimeUtils.prototype.closestElement('auro-dropdown, [auro-dropdown]', this);
+      const dropdownbib = dropdown ? dropdown.bibContent : AuroLibraryRuntimeUtils.prototype.closestElement('auro-dropdownbib', this);
+      const mobileLayout = dropdownbib.hasAttribute('isfullscreen');
+      this.utilCalRender.determineNumCalendarsToRender(this, mobileLayout);
 
-    // Determine which month to render first
-    let dateMatches = undefined;
+      let renderedHtml = undefined;
 
-    if (!mobileLayout && this.centralDate) {
-      // On Desktop start the calendar at the central date if it exists, then minDate and finally the current date.
-      if (this.centralDate) {
-        dateMatches = this.util.datesMatch(this.firstRenderedMonth, this.util.convertDateToFirstOfMonth(this.centralDate));
+      // Determine which month to render first
+      let dateMatches = undefined;
 
-        if (!dateMatches) {
-          this.firstRenderedMonth = this.util.convertDateToFirstOfMonth(this.centralDate);
-        }
-      } else if (this.minDate) {
-        dateMatches = this.util.datesMatch(this.firstRenderedMonth, this.util.convertDateToFirstOfMonth(this.minDate));
+      if (!mobileLayout && this.centralDate) {
+        // On Desktop start the calendar at the central date if it exists, then minDate and finally the current date.
+        if (this.centralDate) {
+          dateMatches = this.util.datesMatch(this.firstRenderedMonth, this.util.convertDateToFirstOfMonth(this.centralDate));
 
-        if (!dateMatches) {
-          this.firstRenderedMonth = this.util.convertDateToFirstOfMonth(this.minDate);
+          if (!dateMatches) {
+            this.firstRenderedMonth = this.util.convertDateToFirstOfMonth(this.centralDate);
+          }
+        } else if (this.minDate) {
+          dateMatches = this.util.datesMatch(this.firstRenderedMonth, this.util.convertDateToFirstOfMonth(this.minDate));
+
+          if (!dateMatches) {
+            this.firstRenderedMonth = this.util.convertDateToFirstOfMonth(this.minDate);
+          }
+        } else {
+          const now = new Date();
+
+          dateMatches = this.util.datesMatch(this.firstRenderedMonth, this.util.convertDateToFirstOfMonth(now));
+
+          if (!dateMatches) {
+            this.firstRenderedMonth = this.util.convertDateToFirstOfMonth(now);
+          }
         }
       } else {
-        const now = new Date();
-
-        dateMatches = this.util.datesMatch(this.firstRenderedMonth, this.util.convertDateToFirstOfMonth(now));
-
-        if (!dateMatches) {
-          this.firstRenderedMonth = this.util.convertDateToFirstOfMonth(now);
-        }
+        // On mobile start the calendar at the previously determined first renderable month.
+        this.firstRenderedMonth = this.firstMonthRenderable;
       }
+
+      // Add the first calendar to the HTML
+      const firstMonth = this.firstRenderedMonth.getMonth() + 1;
+      const firstYear = this.firstRenderedMonth.getFullYear();
+
+      renderedHtml = html`${renderedHtml}${this.utilCalRender.renderCalendar(this, firstMonth, firstYear)}`;
+
+      // Loop through the number of remaining calendars to render and add the HTML
+      let newMonthDate = undefined;
+
+      for (let cal = 0; cal < this.numCalendars - 1; cal += 1) {
+
+        const date = newMonthDate || this.firstRenderedMonth;
+
+        const oldMonth = date.getMonth() + 1;
+        const oldYear = date.getFullYear();
+
+        let newMonth = undefined;
+        let newYear = undefined;
+
+        if (oldMonth === 12) {
+          newMonth = 1;
+          newYear = oldYear + 1;
+        } else {
+          newMonth = oldMonth + 1;
+          newYear = oldYear;
+        }
+
+        const newMonthDateStr = `${newMonth}/1/${newYear}`;
+        newMonthDate = new Date(newMonthDateStr);
+
+        renderedHtml = html`${renderedHtml}${this.utilCalRender.renderCalendar(this, newMonth, newYear)}`;
+      }
+
+      this.allCalendarHtml = renderedHtml;
     } else {
-      // On mobile start the calendar at the previously determined first renderable month.
-      this.firstRenderedMonth = this.firstMonthRenderable;
+      this.allCalendarHtml = null;
     }
-
-    // Add the first calendar to the HTML
-    const firstMonth = this.firstRenderedMonth.getMonth() + 1;
-    const firstYear = this.firstRenderedMonth.getFullYear();
-
-    renderedHtml = html`${renderedHtml}${this.utilCalRender.renderCalendar(this, firstMonth, firstYear)}`;
-
-    // Loop through the number of remaining calendars to render and add the HTML
-    let newMonthDate = undefined;
-
-    for (let cal = 0; cal < this.numCalendars - 1; cal += 1) {
-
-      const date = newMonthDate || this.firstRenderedMonth;
-
-      const oldMonth = date.getMonth() + 1;
-      const oldYear = date.getFullYear();
-
-      let newMonth = undefined;
-      let newYear = undefined;
-
-      if (oldMonth === 12) {
-        newMonth = 1;
-        newYear = oldYear + 1;
-      } else {
-        newMonth = oldMonth + 1;
-        newYear = oldYear;
-      }
-
-      const newMonthDateStr = `${newMonth}/1/${newYear}`;
-      newMonthDate = new Date(newMonthDateStr);
-
-      renderedHtml = html`${renderedHtml}${this.utilCalRender.renderCalendar(this, newMonth, newYear)}`;
-    }
-
-    return renderedHtml;
   }
 
   /**
@@ -256,11 +264,20 @@ export class AuroCalendar extends RangeDatepicker {
       }));
     });
 
-    this.utilCalRender.determineNumCalendarsToRender(this);
-
     window.addEventListener('resize', () => {
-      this.utilCalRender.determineNumCalendarsToRender(this);
+      this.renderAllCalendars();
     });
+  }
+
+  toggleVisibility(visibility) {
+    this.isVisible = visibility;
+
+    // wait for dropdownbib's fullscreen attribute
+    setTimeout(() => this.renderAllCalendars());
+  }
+
+  injectSlot(slotName, nodes) {
+    this.slots[slotName] = nodes;
   }
 
   updated(changedProperties) {
@@ -279,6 +296,8 @@ export class AuroCalendar extends RangeDatepicker {
     if (changedProperties.has('centralDate')) {
       this.utilCal.centralDateChanged(this);
     }
+
+    this.renderAllCalendars();
   }
 
   render() {
@@ -286,13 +305,13 @@ export class AuroCalendar extends RangeDatepicker {
       <div class="calendarWrapper">
         <div class="mobileHeader">
           <div class="headerDateFrom">
-            <span class="mobileDateLabel"><slot name="mobileDateLabel"></slot></span>
+            <span class="mobileDateLabel">${this.slots.mobileDateLabel}</span>
             <slot name="mobileDateFromStr"></slot>
           </div>
           <div class="headerDateTo"><slot name="mobileDateToStr"></slot></div>
         </div>
         <div class="calendars">
-          ${this.renderAllCalendars(this)}
+          ${this.allCalendarHtml}
         </div>
         <div class="mobileFooter">
           <div class="mobileFooterActions">
