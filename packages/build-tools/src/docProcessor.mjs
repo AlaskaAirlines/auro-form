@@ -32,7 +32,7 @@ export const defaultDocsProcessorConfig = {
 
 /**
  * @param {ProcessorConfig} config - The configuration for this processor.
- * @returns {import('../utils/sharedFileProcessorUtils').FileProcessorConfig[]}
+ * @returns {import('@aurodesignsystem/auro-library/scripts/utils/sharedFileProcessorUtils').FileProcessorConfig[]}
  */
 export const fileConfigs = (config) => [
   // README.md
@@ -40,7 +40,7 @@ export const fileConfigs = (config) => [
     identifier: 'README.md',
     input: {
       remoteUrl: generateReadmeUrl(config.remoteReadmeVersion, config.remoteReadmeVariant),
-      fileName: fromAuroComponentRoot(`components/${config.component}//docTemplates/README.md`),
+      fileName: fromAuroComponentRoot(`components/${config.component}/docTemplates/README.md`),
       overwrite: config.overwriteLocalCopies
     },
     output: fromAuroComponentRoot(`components/${config.component}/README.md`)
