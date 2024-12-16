@@ -36,9 +36,9 @@ import AuroFormValidation from '@auro-formkit/form-validation';
  * @attr {String}  isValid - (DEPRECATED - Please use validity) Can be accessed to determine if the input validity. Returns true when validity has not yet been checked or validity = 'valid', all other cases return false. Not intended to be set by the consumer.
  * @attr {String}  label - Deprecated, see `slot`.
  * @attr {String}  lang - defines the language of an element.
- * @attr {String}  max - The maximum value allowed. This only applies for inputs with a type of `numeric` and all date formats.
+ * @attr {String}  max - The maximum value allowed. This only applies for inputs with a type of `number` and all date formats.
  * @attr {Number}  maxLength - The maximum number of characters the user can enter into the text input. This must be an integer value `0` or higher.
- * @attr {String}  min - The minimum value allowed. This only applies for inputs with a type of `numeric` and all date formats.
+ * @attr {String}  min - The minimum value allowed. This only applies for inputs with a type of `number` and all date formats.
  * @attr {Number}  minLength - The minimum number of characters the user can enter into the text input. This must be an non-negative integer value smaller than or equal to the value specified by `maxlength`.
  * @attr {String}  name - Populates the `name` attribute on the input.
  * @attr {Boolean} noValidate - If set, disables auto-validation on blur.
@@ -247,7 +247,7 @@ export default class BaseInput extends LitElement {
             delimiter: ''
           };
 
-          this.inputMode = 'numeric';
+          this.inputMode = 'number';
 
           break;
 
@@ -256,7 +256,7 @@ export default class BaseInput extends LitElement {
             creditCard: true
           };
 
-          this.inputMode = 'numeric';
+          this.inputMode = 'number';
 
           break;
 
@@ -271,7 +271,7 @@ export default class BaseInput extends LitElement {
             ]
           };
 
-          this.inputMode = 'numeric';
+          this.inputMode = 'number';
 
           break;
 
@@ -286,7 +286,7 @@ export default class BaseInput extends LitElement {
             ]
           };
 
-          this.inputMode = 'numeric';
+          this.inputMode = 'number';
 
           break;
 
@@ -299,7 +299,7 @@ export default class BaseInput extends LitElement {
             ]
           };
 
-          this.inputMode = 'numeric';
+          this.inputMode = 'number';
 
           break;
 
@@ -312,7 +312,7 @@ export default class BaseInput extends LitElement {
             ]
           };
 
-          this.inputMode = 'numeric';
+          this.inputMode = 'number';
 
           break;
 
@@ -322,7 +322,7 @@ export default class BaseInput extends LitElement {
             datePattern: ['Y']
           };
 
-          this.inputMode = 'numeric';
+          this.inputMode = 'number';
 
           break;
 
@@ -332,7 +332,7 @@ export default class BaseInput extends LitElement {
             datePattern: ['y']
           };
 
-          this.inputMode = 'numeric';
+          this.inputMode = 'number';
 
           break;
 
@@ -342,7 +342,7 @@ export default class BaseInput extends LitElement {
             datePattern: ['m']
           };
 
-          this.inputMode = 'numeric';
+          this.inputMode = 'number';
 
           break;
 
@@ -608,7 +608,7 @@ export default class BaseInput extends LitElement {
    * @return {void}
    */
   handleInput() {
-    // Prevent non-numeric characters from being entered on credit card fields.
+    // Prevent non-number characters from being entered on credit card fields.
     if (this.type === 'credit-card') {
       this.inputElement.value = this.inputElement.value.replace(/[\D]/gu, '');
     }
