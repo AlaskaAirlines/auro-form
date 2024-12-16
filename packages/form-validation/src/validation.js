@@ -144,6 +144,10 @@ export default class AuroFormValidation {
         this.validateType(elem);
         this.validateAttributes(elem);
       }
+    } else if (elem.value === undefined) {
+      // Reset the validity state if input is programmatically reset
+      elem.validity = undefined;
+      elem.isValid = false;
     }
 
     if (this.auroInputElements && this.auroInputElements.length > 0) {
