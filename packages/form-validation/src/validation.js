@@ -152,7 +152,6 @@ export default class AuroFormValidation {
     } else if (elem.value === undefined) {
       // Reset the validity state if input is programmatically reset
       elem.validity = undefined;
-      elem.isValid = false;
     }
 
     if (this.auroInputElements && this.auroInputElements.length > 0) {
@@ -169,14 +168,10 @@ export default class AuroFormValidation {
 
     if (validationShouldRun || elem.hasAttribute('error')) {
       if (elem.validity && elem.validity !== 'valid') {
-        elem.isValid = false;
-
         // Use the validity message override if it is declared
         if (elem.ValidityMessageOverride) {
           elem.setCustomValidity = elem.ValidityMessageOverride;
         }
-      } else {
-        elem.isValid = true;
       }
 
       this.getErrorMessage(elem);
