@@ -85,6 +85,11 @@ export class AuroSelect extends LitElement {
      * @private
      */
     this.dropdownTag = versioning.generateTag('auro-dropdown', dropdownVersion, AuroDropdown);
+
+    /**
+     * @private
+     */
+    this.isHiddenWhileLoading = false;
   }
 
   /**
@@ -237,6 +242,7 @@ export class AuroSelect extends LitElement {
    */
   configureMenu() {
     this.menu = this.querySelector('auro-menu, [auro-menu]');
+    this.menu.addEventListener("auroMenu-loadingChange", (event) => this.handleMenuLoadingChange(event));
     // racing condition on custom-select with custom-menu
     if (!this.menu) {
       setTimeout(() => {
@@ -344,6 +350,32 @@ export class AuroSelect extends LitElement {
     });
 
     this.labelForSr();
+  }
+
+  /**
+   * Manages the visibility of the dropdown based on loading state changes.
+   *
+   * This method listens for loading state changes and adjusts the visibility of the dropdown accordingly.
+   * If the dropdown is visible and loading is true without any loading placeholders, it hides the dropdown
+   * and sets a flag to indicate it is hidden while loading. If loading is false and the dropdown was previously
+   * hidden, it checks if the active element is within the dropdown and shows it again if true.
+   *
+   * @private
+   * @param {CustomEvent} event - The event object containing details about the loading state change.
+   * @param {boolean} event.detail.loading - Indicates whether the menu is currently loading.
+   * @param {boolean} event.detail.hasLoadingPlaceholder - Indicates if there are loading placeholders present.
+   * @returns {void}
+   */
+  handleMenuLoadingChange(event) {
+    if (this.dropdown.isPopoverVisible && event.detail.loading && !event.detail.hasLoadingPlaceholder) {
+      this.isHiddenWhileLoading = true;
+      this.dropdown.hide();
+    } else if (!event.detail.loading && this.isHiddenWhileLoading) {
+      if (this.contains(document.activeElement)) {
+        this.dropdown.show();
+      }
+      this.isHiddenWhileLoading = false;
+    }
   }
 
   /**

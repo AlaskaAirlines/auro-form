@@ -4,14 +4,16 @@ The auro-menu element provides users a way to select from a list of options.
 
 ## Properties
 
-| Property         | Attribute        | Type      | Default     | Description                                      |
-|------------------|------------------|-----------|-------------|--------------------------------------------------|
-| `disabled`       | `disabled`       | `Boolean` |             | When true, the entire menu and all options are disabled; |
-| `matchWord`      | `matchWord`      | `String`  | "undefined" | Specifies the a string used to highlight matched string parts in options. |
-| `noCheckmark`    | `noCheckmark`    | `Boolean` | false       | When true, selected option will not show the checkmark. |
-| `optionActive`   | `optionActive`   | `object`  | "undefined" |                                                  |
-| `optionSelected` | `optionSelected` | `Object`  | "undefined" | Specifies the current selected menuOption.       |
-| `value`          | `value`          | `String`  | "undefined" | Value selected for the menu.                     |
+| Property                | Attribute        | Type      | Default     | Description                                      |
+|-------------------------|------------------|-----------|-------------|--------------------------------------------------|
+| `disabled`              | `disabled`       | `Boolean` |             | When true, the entire menu and all options are disabled; |
+| `hasLoadingPlaceholder` |                  | `Boolean` |             | Indicates whether the menu has a loadingIcon or loadingText to render when in a loading state. |
+| `loading`               | `loading`        | `Boolean` | false       | When true, displays a loading state using the loadingIcon and loadingText slots if provided. |
+| `matchWord`             | `matchWord`      | `String`  | "undefined" | Specifies a string used to highlight matched string parts in options. |
+| `noCheckmark`           | `noCheckmark`    | `Boolean` | false       | When true, selected option will not show the checkmark. |
+| `optionActive`          | `optionActive`   | `object`  | "undefined" |                                                  |
+| `optionSelected`        | `optionSelected` | `Object`  | "undefined" | Specifies the current selected menuOption.       |
+| `value`                 | `value`          | `String`  | "undefined" | Value selected for the menu.                     |
 
 ## Methods
 
@@ -23,23 +25,26 @@ The auro-menu element provides users a way to select from a list of options.
 
 ## Events
 
-| Event                         | Type                   | Description                                      |
-|-------------------------------|------------------------|--------------------------------------------------|
-| `auroMenu-activatedOption`    | `CustomEvent<Element>` | Notifies that a menuoption has been made `active`. |
-| `auroMenu-customEventFired`   | `CustomEvent<any>`     | Notifies that a custom event has been fired.     |
-| `auroMenu-selectValueFailure` | `CustomEvent<any>`     | Notifies that a an attempt to select a menuoption by matching a value has failed. |
-| `auroMenu-selectValueReset`   | `CustomEvent<any>`     | Notifies that the component value has been reset. |
-| `auroMenu-selectedOption`     | `CustomEvent<any>`     | Notifies that a new menuoption selection has been made. |
-| `auroMenuActivatedOption`     | `CustomEvent<Element>` | (DEPRECATED) Notifies that a menuoption has been made `active`. |
-| `auroMenuCustomEventFired`    | `CustomEvent<any>`     | (DEPRECATED) Notifies that a custom event has been fired. |
-| `auroMenuSelectValueFailure`  | `CustomEvent<any>`     | (DEPRECATED) Notifies that a an attempt to select a menuoption by matching a value has failed. |
-| `selectedOption`              | `CustomEvent<any>`     | (DEPRECATED) Notifies that a new menuoption selection has been made. |
+| Event                         | Type                                             | Description                                      |
+|-------------------------------|--------------------------------------------------|--------------------------------------------------|
+| `auroMenu-activatedOption`    | `CustomEvent<Element>`                           | Notifies that a menuoption has been made `active`. |
+| `auroMenu-customEventFired`   | `CustomEvent<any>`                               | Notifies that a custom event has been fired.     |
+| `auroMenu-loadingChange`      | `CustomEvent<{ loading: boolean; hasLoadingPlaceholder: boolean; }>` | Notifies when the loading attribute is changed.  |
+| `auroMenu-selectValueFailure` | `CustomEvent<any>`                               | Notifies that a an attempt to select a menuoption by matching a value has failed. |
+| `auroMenu-selectValueReset`   | `CustomEvent<any>`                               | Notifies that the component value has been reset. |
+| `auroMenu-selectedOption`     | `CustomEvent<any>`                               | Notifies that a new menuoption selection has been made. |
+| `auroMenuActivatedOption`     | `CustomEvent<Element>`                           | (DEPRECATED) Notifies that a menuoption has been made `active`. |
+| `auroMenuCustomEventFired`    | `CustomEvent<any>`                               | (DEPRECATED) Notifies that a custom event has been fired. |
+| `auroMenuSelectValueFailure`  | `CustomEvent<any>`                               | (DEPRECATED) Notifies that a an attempt to select a menuoption by matching a value has failed. |
+| `selectedOption`              | `CustomEvent<any>`                               | (DEPRECATED) Notifies that a new menuoption selection has been made. |
 
 ## Slots
 
-| Name | Description                         |
-|------|-------------------------------------|
-|      | Slot for insertion of menu options. |
+| Name          | Description                                 |
+|---------------|---------------------------------------------|
+|               | Slot for insertion of menu options.         |
+| `loadingIcon` | Icon to show while loading attribute is set |
+| `loadingText` | Text to show while loading attribute is set |
 
 
 # auro-menuoption

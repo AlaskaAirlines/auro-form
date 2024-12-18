@@ -66,6 +66,11 @@ export class AuroCombobox extends LitElement {
     this.runtimeUtils = new AuroLibraryRuntimeUtils();
 
     /**
+     * @private
+     */
+    this.isHiddenWhileLoading = false;
+
+    /**
      * Generate unique names for dependency components.
      */
     const versioning = new AuroDependencyVersioning();
@@ -200,7 +205,7 @@ export class AuroCombobox extends LitElement {
       this.noMatchOption = undefined;
 
       this.options.forEach((option) => {
-        let matchString = option.innerText.toLowerCase();
+        let matchString = option.textContent.toLowerCase();
 
         if (option.hasAttribute('nomatch')) {
           this.noMatchOption = option;
@@ -276,8 +281,12 @@ export class AuroCombobox extends LitElement {
       return;
     }
     if (!this.dropdown.isPopoverVisible && this.input.value && this.input.value.length > 0) {
-      if ((this.availableOptions && this.availableOptions.length > 0) || this.noMatchOption !== undefined) { // eslint-disable-line no-extra-parens
-        this.dropdown.show();
+      if (this.menu.getAttribute('loading') || (this.availableOptions && this.availableOptions.length > 0) || this.noMatchOption !== undefined) { // eslint-disable-line no-extra-parens
+        if (this.menu.hasAttribute('loading') && !this.menu.hasLoadingPlaceholder) {
+          this.isHiddenWhileLoading = true;
+        } else {
+          this.dropdown.show();
+        }
       }
     }
   }
@@ -309,7 +318,7 @@ export class AuroCombobox extends LitElement {
    */
   configureMenu() {
     this.menu = this.querySelector('auro-menu, [auro-menu]');
-
+    this.menu.addEventListener("auroMenu-loadingChange", (event) => this.handleMenuLoadingChange(event));
 
     // a racing condition on custom-combobox with custom-menu
     if (!this.menu) {
@@ -320,7 +329,7 @@ export class AuroCombobox extends LitElement {
       return;
     }
 
-    this.menu.shadowRoot.addEventListener('slotchange', () => this.handleSlotChange());
+    this.menu.shadowRoot.addEventListener('slotchange', (event) => this.handleSlotChange(event));
 
     if (this.checkmark) {
       this.menu.removeAttribute('nocheckmark');
@@ -342,8 +351,8 @@ export class AuroCombobox extends LitElement {
           this.value = this.optionSelected.value;
         }
 
-        if (this.input.value !== this.optionSelected.innerText) {
-          this.input.value = this.optionSelected.innerText;
+        if (this.input.value !== this.optionSelected.textContent) {
+          this.input.value = this.optionSelected.textContent;
         }
 
         if (this.menu.matchWord !== this.input.value) {
@@ -419,7 +428,7 @@ export class AuroCombobox extends LitElement {
         this.menu.value = this.value;
       }
 
-      if (this.optionSelected && this.input.value !== this.optionSelected.innerText) {
+      if (this.optionSelected && this.input.value !== this.optionSelected.textContent) {
         this.optionSelected = undefined;
       }
 
@@ -458,6 +467,29 @@ export class AuroCombobox extends LitElement {
     this.input.addEventListener('auroFormElement-validated', (evt) => {
       this.auroInputHelpText = evt.detail.message;
     });
+  }
+
+  /**
+   * Manages the visibility of the dropdown based on loading state changes.
+   *
+   * This method listens for loading state changes and adjusts the visibility of the dropdown accordingly.
+   * If the dropdown is visible and loading is true without any loading placeholders, it hides the dropdown
+   * and sets a flag to indicate it is hidden while loading. If loading is false and the dropdown was previously
+   * hidden, it checks if the active element is within the dropdown and shows it again if true.
+   *
+   * @private
+   * @param {CustomEvent} event - The event object containing details about the loading state change.
+   * @param {boolean} event.detail.loading - Indicates whether the menu is currently loading.
+   * @param {boolean} event.detail.hasLoadingPlaceholder - Indicates if there are loading placeholders present.
+   * @returns {void}
+   */
+  handleMenuLoadingChange(event) {
+    if (!event.detail.loading && this.isHiddenWhileLoading) {
+      if (this.contains(document.activeElement)) {
+        this.dropdown.show();
+      }
+      this.isHiddenWhileLoading = false;
+    }
   }
 
   /**
@@ -506,7 +538,7 @@ export class AuroCombobox extends LitElement {
        */
       if (evt.key === 'ArrowUp' || evt.key === 'ArrowDown') {
         if (this.availableOptions.length > 0) {
-          this.dropdown.show();
+          this.showBib();
         }
 
         if (this.dropdown.isPopoverVisible) {
@@ -578,8 +610,8 @@ export class AuroCombobox extends LitElement {
       if (this.value) {
         if (this.optionSelected && this.optionSelected.value === this.value) {
           // If value updates and the previously selected option already matches the new value
-          // just update the input value to use the innerText of the optionSelected
-          this.input.value = this.optionSelected.innerText;
+          // just update the input value to use the textContent of the optionSelected
+          this.input.value = this.optionSelected.textContent;
         } else {
           // Otherwise just enter the value into the input
           this.optionSelected = undefined;
@@ -609,19 +641,23 @@ export class AuroCombobox extends LitElement {
   /**
    * Watch for slot changes and recalculate the menuoptions.
    * @private
+   * @param {Event} event - slotchange event
    * @returns {void}
    */
-  handleSlotChange() {
-    this.options = this.menu.querySelectorAll('auro-menuoption, [auro-menuoption]');
-    this.options.forEach((opt) => {
-      if (this.checkmark) {
-        opt.removeAttribute('nocheckmark');
-      } else {
-        opt.setAttribute('nocheckmark', '');
-      }
-    });
+  handleSlotChange(event) {
+    // treat only generic menuoptions
+    if (!event.target.name) {
+      this.options = this.menu.querySelectorAll('auro-menuoption, [auro-menuoption]');
+      this.options.forEach((opt) => {
+        if (this.checkmark) {
+          opt.removeAttribute('nocheckmark');
+        } else {
+          opt.setAttribute('nocheckmark', '');
+        }
+      });
 
-    this.handleMenuOptions();
+      this.handleMenuOptions();
+    }
   }
 
   // function that renders the HTML and CSS into  the scope of the component
@@ -631,7 +667,7 @@ export class AuroCombobox extends LitElement {
         <div aria-live="polite" class="util_displayHiddenVisually">
           ${this.optionActive && this.availableOptions.length > 0
             ? html`
-              ${`${this.optionActive.innerText}, selected, ${this.availableOptions.indexOf(this.optionActive) + 1} of ${this.availableOptions.length}`}
+              ${`${this.optionActive.textContent}, selected, ${this.availableOptions.indexOf(this.optionActive) + 1} of ${this.availableOptions.length}`}
             `
             : undefined
           }

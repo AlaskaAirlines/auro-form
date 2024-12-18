@@ -11,16 +11,16 @@ import tokensCss from "./styles/tokens-css.js";
 
 import AuroLibraryRuntimeUtils from '@aurodesignsystem/auro-library/scripts/utils/runtimeUtils.mjs';
 
-import './auro-menuoption.js';
-
 // See https://git.io/JJ6SJ for "How to document your components using JSDoc"
 /**
  * The auro-menu element provides users a way to select from a list of options.
  * @attr {Object} optionSelected - Specifies the current selected menuOption.
- * @attr {String} matchWord - Specifies the a string used to highlight matched string parts in options.
+ * @attr {String} matchWord - Specifies a string used to highlight matched string parts in options.
  * @attr {Boolean} disabled - When true, the entire menu and all options are disabled;
  * @attr {Boolean} noCheckmark - When true, selected option will not show the checkmark.
+ * @attr {Boolean} loading - When true, displays a loading state using the loadingIcon and loadingText slots if provided.
  * @attr {String} value - Value selected for the menu.
+ * @prop {Boolean} hasLoadingPlaceholder - Indicates whether the menu has a loadingIcon or loadingText to render when in a loading state.
  * @event auroMenu-selectedOption - Notifies that a new menuoption selection has been made.
  * @event selectedOption - (DEPRECATED) Notifies that a new menuoption selection has been made.
  * @event auroMenu-activatedOption - Notifies that a menuoption has been made `active`.
@@ -30,7 +30,10 @@ import './auro-menuoption.js';
  * @event auroMenu-customEventFired - Notifies that a custom event has been fired.
  * @event auroMenuCustomEventFired - (DEPRECATED) Notifies that a custom event has been fired.
  * @event auroMenu-selectValueReset - Notifies that the component value has been reset.
- * @slot Slot for insertion of menu options.
+ * @event auroMenu-loadingChange - Notifies when the loading attribute is changed.
+ * @slot loadingText - Text to show while loading attribute is set
+ * @slot loadingIcon - Icon to show while loading attribute is set
+ * @slot - Slot for insertion of menu options.
  */
 
 /* eslint-disable no-magic-numbers, max-lines */
@@ -43,6 +46,7 @@ export class AuroMenu extends LitElement {
     this.matchWord = undefined;
     this.noCheckmark = false;
     this.optionActive = undefined;
+    this.loading = false;
 
     /**
      * @private
@@ -58,6 +62,11 @@ export class AuroMenu extends LitElement {
      * @private
      */
     this.nestingSpacer = '<span class="nestingSpacer"></span>';
+
+    /**
+     * @private
+     */
+    this.loadingSlots = null;
   }
 
   static get properties() {
@@ -67,6 +76,10 @@ export class AuroMenu extends LitElement {
         reflect: true
       },
       disabled:    {
+        type: Boolean,
+        reflect: true
+      },
+      loading:     {
         type: Boolean,
         reflect: true
       },
@@ -123,6 +136,8 @@ export class AuroMenu extends LitElement {
     this.runtimeUtils.handleComponentTagRename(this, 'auro-menu');
 
     this.addEventListener('keydown', this.handleKeyDown);
+
+    this.loadingSlots = this.querySelectorAll("[slot='loadingText'], [slot='loadingIcon']");
   }
 
   updated(changedProperties) {
@@ -140,6 +155,18 @@ export class AuroMenu extends LitElement {
       for (const element of options) {
         element.disabled = this.disabled;
       }
+    }
+
+    if (changedProperties.has('loading')) {
+      const event = new CustomEvent("auroMenu-loadingChange", {
+        detail: {
+          loading: this.loading,
+          hasLoadingPlaceholder:
+          this.hasLoadingPlaceholder
+        }
+      });
+      this.setAttribute("aria-busy", this.hasAttribute("loading"));
+      this.dispatchEvent(event);
     }
   }
 
@@ -482,6 +509,21 @@ export class AuroMenu extends LitElement {
   }
 
   /**
+   * Checks if there are any loading placeholders in the component.
+   *
+   * This getter evaluates the `loadingSlots` collection to determine if it contains any items.
+   * If the size of the collection is greater than zero, it indicates the presence of loading
+   * placeholders, returning true; otherwise, it returns false.
+   *
+   * @getter hasLoadingPlaceholder
+   * @type {boolean}
+   * @returns {boolean} Returns true if loading placeholders exist; false otherwise.
+   */
+  get hasLoadingPlaceholder() {
+    return this.loadingSlots.length > 0;
+  }
+
+  /**
    * Used for @slotchange event on slotted element.
    * @private
    */
@@ -514,8 +556,16 @@ export class AuroMenu extends LitElement {
   }
 
   render() {
-    return html`
-      <slot @slotchange=${this.handleSlotItems}></slot>
-    `;
+    if (this.loading) {
+      return html`
+        <auro-menuoption disabled loadingplaceholder class="${this.hasLoadingPlaceholder ? '' : 'empty'}">
+          <div>
+            <slot name="loadingIcon"></slot>
+            <slot name="loadingText"></slot>
+          </div>
+        </auro-menuoption>
+      `;
+    }
+    return html`<slot @slotchange=${this.handleSlotItems}></slot>`;
   }
 }
