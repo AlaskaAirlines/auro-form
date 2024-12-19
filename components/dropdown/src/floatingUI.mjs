@@ -1,6 +1,7 @@
 /* eslint-disable line-comment-position, no-inline-comments */
 
 import { autoUpdate, computePosition, offset, autoPlacement, flip } from '@floating-ui/dom';
+import AuroLibraryRuntimeUtils from '@aurodesignsystem/auro-library/scripts/utils/runtimeUtils.mjs';
 
 export default class AuroFloatingUI {
   constructor() {
@@ -219,6 +220,11 @@ export default class AuroFloatingUI {
       this.updateCurrentExpandedDropdown();
       this.element.isPopoverVisible = true;
       this.element.triggerChevron?.setAttribute('data-expanded', true);
+
+      if (this.element.boundModaless) {
+        this.element.boundModaless.modal = true;
+      }
+
       this.dispatchEventDropdownToggle();
       this.position();
       
@@ -237,6 +243,11 @@ export default class AuroFloatingUI {
     if (this.element.isPopoverVisible && !this.element.disabled && !this.element.noToggle) {
       this.element.isPopoverVisible = false;
       this.element.triggerChevron?.removeAttribute('data-expanded');
+
+      if (this.element.boundModaless) {
+        this.element.boundModaless.modal = false;
+      }
+
       this.dispatchEventDropdownToggle();
     }
   }
@@ -350,6 +361,10 @@ export default class AuroFloatingUI {
 
   configure(elem) {
     this.element = elem;
+    const parentDialog = AuroLibraryRuntimeUtils.prototype.closestElement('auro-dialog, [auro-dialog]', elem);
+    if (parentDialog && !parentDialog.modal) {
+      this.element.boundModaless = parentDialog;
+    }
     this.element.trigger = this.element.shadowRoot.querySelector('#trigger');
     this.element.bib = this.element.shadowRoot.querySelector('#bib');
     this.element.bibSizer = this.element.shadowRoot.querySelector('#bibSizer');
