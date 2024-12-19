@@ -158,7 +158,10 @@ export default class BaseInput extends LitElement {
       name:                    { type: String },
       type:                    { type: String,
         reflect: true },
-      value:                   { type: String },
+      value:                   {
+        type: String,
+        reflect: true
+      },
       lang:                    { type: String },
       pattern:                 {
         type: String,
