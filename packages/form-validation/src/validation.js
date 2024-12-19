@@ -26,10 +26,15 @@ export default class AuroFormValidation {
         elem.validity = 'badInput';
         elem.setCustomValidity = elem.setCustomValidityBadInput || '';
       }
-    } else if (elem.value && elem.value.length > 0 && elem.value.length < elem.minLength) {
+    }
+
+    // Length > 0 is required to prevent the error message from showing when the input is empty
+    if (elem.value?.length > 0 && elem.value?.length < elem.minLength) {
       elem.validity = 'tooShort';
       elem.setCustomValidity = elem.setCustomValidityTooShort || '';
-    } else if (elem.value && elem.value.length > elem.maxLength) {
+    }
+    
+    if (elem.value?.length > elem.maxLength) {
       elem.validity = 'tooLong';
       elem.setCustomValidity = elem.setCustomValidityTooLong || '';
     }
@@ -55,7 +60,7 @@ export default class AuroFormValidation {
           elem.validity = 'tooShort';
           elem.setCustomValidity = elem.setCustomValidityForType || '';
         }
-      } else if (elem.type === 'number' || elem.type === 'numeric') { // 'numeric` is a deprecated alias for number'
+      } else if (elem.type === 'number') {
         if (elem.max !== undefined && Number(elem.max) < Number(elem.value)) {
           elem.validity = 'rangeOverflow';
           elem.setCustomValidity = elem.getAttribute('setCustomValidityRangeOverflow') || '';
@@ -160,14 +165,10 @@ export default class AuroFormValidation {
 
     if (validationShouldRun || elem.hasAttribute('error')) {
       if (elem.validity && elem.validity !== 'valid') {
-        elem.isValid = false;
-
         // Use the validity message override if it is declared
         if (elem.ValidityMessageOverride) {
           elem.setCustomValidity = elem.ValidityMessageOverride;
         }
-      } else {
-        elem.isValid = true;
       }
 
       this.getErrorMessage(elem);
