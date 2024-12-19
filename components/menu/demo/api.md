@@ -13,10 +13,11 @@ The auro-menu element provides users a way to select from a list of options.
 | [hasLoadingPlaceholder](#hasLoadingPlaceholder) |                  | `Boolean` |             | Indicates whether the menu has a loadingIcon or loadingText to render when in a loading state. |
 | [loading](#loading)               | `loading`        | `Boolean` | false       | When true, displays a loading state using the loadingIcon and loadingText slots if provided. |
 | [matchWord](#matchWord)             | `matchWord`      | `String`  | "undefined" | Specifies a string used to highlight matched string parts in options. |
+| [multiSelect](#multiSelect)           | `multiSelect`    | `Boolean` | "undefined" | When true, the selected option can be multiple option. |
 | [noCheckmark](#noCheckmark)           | `noCheckmark`    | `Boolean` | false       | When true, selected option will not show the checkmark. |
 | [optionActive](#optionActive)          | `optionActive`   | `object`  | "undefined" |                                                  |
 | [optionSelected](#optionSelected)        | `optionSelected` | `Object`  | "undefined" | Specifies the current selected menuOption.       |
-| [value](#value)                 | `value`          | `String`  | "undefined" | Value selected for the menu.                     |
+| [value](#value)                 | `value`          | `String`  | "undefined" | Value selected for the menu, can be String or Array if `multiSelect` is true. |
 
 ## Methods
 
@@ -306,6 +307,38 @@ export function auroMenuMatchWordExample() {
     <auro-menuoption value="oranges">Oranges</auro-menuoption>
     <auro-menuoption value="peaches">Peaches</auro-menuoption>
   </auro-menu>
+  <auro-menuoption value="arrival">Arrival</auro-menuoption>
+</auro-menu>
+```
+<!-- AURO-GENERATED-CONTENT:END -->
+</auro-accordion>
+
+### Multi Select<a name="multiSelect"></a>
+The `auro-menu` supports a multi-select option. To use, place the `multiSelect` attribute on the `<auro-menu>` element tag. When applied, the `value` attribute will become an Array versus String value.
+
+<div class="exampleWrapper">
+  <!-- AURO-GENERATED-CONTENT:START (FILE:src=./../apiExamples/multiple.html) -->
+  <!-- The below content is automatically added from ./../apiExamples/multiple.html -->
+  <auro-menu multiSelect>
+    <auro-menuoption value="stops">Stops</auro-menuoption>
+    <auro-menuoption value="price">Price</auro-menuoption>
+    <auro-menuoption value="duration">Duration</auro-menuoption>
+    <auro-menuoption value="departure">Departure</auro-menuoption>
+    <auro-menuoption value="arrival">Arrival</auro-menuoption>
+  </auro-menu>
+  <!-- AURO-GENERATED-CONTENT:END -->
+</div>
+<auro-accordion alignRight>
+  <span slot="trigger">See code</span>
+<!-- AURO-GENERATED-CONTENT:START (CODE:src=./../apiExamples/multiple.html) -->
+<!-- The below code snippet is automatically added from ./../apiExamples/multiple.html -->
+
+```html
+<auro-menu multiSelect>
+  <auro-menuoption value="stops">Stops</auro-menuoption>
+  <auro-menuoption value="price">Price</auro-menuoption>
+  <auro-menuoption value="duration">Duration</auro-menuoption>
+  <auro-menuoption value="departure">Departure</auro-menuoption>
   <auro-menuoption value="arrival">Arrival</auro-menuoption>
 </auro-menu>
 ```

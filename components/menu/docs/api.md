@@ -10,10 +10,11 @@ The auro-menu element provides users a way to select from a list of options.
 | `hasLoadingPlaceholder` |                  | `Boolean` |             | Indicates whether the menu has a loadingIcon or loadingText to render when in a loading state. |
 | `loading`               | `loading`        | `Boolean` | false       | When true, displays a loading state using the loadingIcon and loadingText slots if provided. |
 | `matchWord`             | `matchWord`      | `String`  | "undefined" | Specifies a string used to highlight matched string parts in options. |
+| `multiSelect`           | `multiSelect`    | `Boolean` | "undefined" | When true, the selected option can be multiple option. |
 | `noCheckmark`           | `noCheckmark`    | `Boolean` | false       | When true, selected option will not show the checkmark. |
 | `optionActive`          | `optionActive`   | `object`  | "undefined" |                                                  |
 | `optionSelected`        | `optionSelected` | `Object`  | "undefined" | Specifies the current selected menuOption.       |
-| `value`                 | `value`          | `String`  | "undefined" | Value selected for the menu.                     |
+| `value`                 | `value`          | `String`  | "undefined" | Value selected for the menu, can be String or Array if `multiSelect` is true. |
 
 ## Methods
 
